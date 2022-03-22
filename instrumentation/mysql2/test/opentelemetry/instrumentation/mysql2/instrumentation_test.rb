@@ -274,6 +274,15 @@ describe OpenTelemetry::Instrumentation::Mysql2::Instrumentation do
           end
         end
       end
+
+      describe 'when .with_attributes is set' do
+        it 'set these on span' do
+          OpenTelemetry::Instrumentation::Mysql2.with_attributes('foo' => 'bar') do
+            client.query('SELECT 1')
+          end
+          _(span.attributes['foo']).must_equal 'bar'
+        end
+      end
     end
   end unless ENV['OMIT_SERVICES']
 end

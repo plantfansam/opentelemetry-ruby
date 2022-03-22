@@ -52,6 +52,7 @@ module OpenTelemetry
 
           def query(sql, options = {})
             attributes = client_attributes
+            attributes.merge!(OpenTelemetry::Instrumentation::Mysql2.attributes)
             case config[:db_statement]
             when :include
               attributes['db.statement'] = sql

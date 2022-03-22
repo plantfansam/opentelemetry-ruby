@@ -30,6 +30,15 @@ OpenTelemetry::SDK.configure do |c|
 end
 ```
 
+MySql2 instrumentation allows the user to supply additional attributes via context propagation.
+
+```ruby
+client = Mysql2::Client.new(:host => "localhost", :username => "root")
+OpenTelemetry::Instrumentation::Mysql2.with_attributes('foo' => 'bar') do
+  client.query("SELECT 1")
+end
+```
+
 ### Configuration options
 
 ```ruby

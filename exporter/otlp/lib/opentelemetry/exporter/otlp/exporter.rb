@@ -149,6 +149,7 @@ module OpenTelemetry
         end
 
         def send_bytes(bytes, timeout:) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
+          @metrics_reporter.record_value('otel.otlp_exporter.bundle_bytes', value: bytes&.bytesize || 0)
           return FAILURE if bytes.nil?
 
           retry_count = 0
@@ -158,7 +159,9 @@ module OpenTelemetry
             request = Net::HTTP::Post.new(@path)
             request.body = if @compression == 'gzip'
                              request.add_field('Content-Encoding', 'gzip')
-                             Zlib.gzip(bytes)
+                             Zlib.gzip(bytes).tap do |bytes|
+                              @metrics_reporter.record_value('otel.otlp_exporter.bundle_bytes_gzipped', value: bytes.bytesize)
+                             end
                            else
                              bytes
                            end
